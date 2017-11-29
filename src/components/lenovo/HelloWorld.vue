@@ -19,16 +19,16 @@
 <script>
 
   import Drop from './drop.vue';
+  import { addEvent, removeEvent, getAllScrollParents } from './src/common'
 
 export default {
   name: 'lenovo-input',
   data () {
     return {
       dropVisible:false,
-      pos: {
-        left: 0,
-        top: 0
-      }
+      pos: {},
+      slot: {},
+      allScrollParents: {}
     }
   },
   beforeMount(){
@@ -36,34 +36,11 @@ export default {
     t.$nextTick( () => {
       t.$el.dropmenu = t.$refs.drop.$el;
 
-      // 计算drop位置
-      let slot = t.$refs.slot;
+      // 获取drop
+      t.slot = t.$refs.slot;
 
+      t.allScrollParents = getAllScrollParents(t.$el);
 
-      // scrollTop需要兼容
-      let top = slot.getBoundingClientRect().top + document.documentElement.scrollTop + slot.offsetHeight + 5;
-      let left = slot.getBoundingClientRect().left + document.documentElement.scrollLeft;
-
-      t.pos = {
-        top: top + 'px',
-        left: left + 'px',
-      }
-
-      let offsetParent = t.$el.offsetParent;
-
-      if(offsetParent !== document.body){
-        offsetParent.addEventListener('mousewheel', function(){
-          let top = slot.getBoundingClientRect().top + document.documentElement.scrollTop + slot.offsetHeight + 5;
-          let left = slot.getBoundingClientRect().left + document.documentElement.scrollLeft;
-
-          t.pos = {
-            top: top + 'px',
-            left: left + 'px',
-          }
-
-          console.log('scroll')
-        })
-      }
     } )
   },
   components: {
@@ -72,24 +49,46 @@ export default {
   methods: {
     handleClick(){
       let t = this;
-
-//      // 计算drop位置
-//      let slot = t.$refs.slot;
-//
-//      let top = slot.getBoundingClientRect().top + document.body.scrollTop + slot.offsetHeight + 5;
-//      let left = slot.getBoundingClientRect().left + document.body.scrollLeft;
-//
-//      t.pos = {
-//        top: top + 'px',
-//        left: left + 'px',
-//      }
-
       t.dropVisible = true;
+      t.handleScroll();
+      // 绑定滚动事件定位drop元素
+      t.addScrollEvent();
     },
     hideDrop(){
       let t = this;
       t.dropVisible = false;
-    }
+      // 解除滚动事件定位drop元素
+      t.removeScrollEvent();
+    },
+    // 滚动计算drop的位置
+    handleScroll(){
+      let t = this;
+
+      let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      let scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+
+      // scrollTop需要兼容
+      let top = t.slot.getBoundingClientRect().top + scrollTop + t.slot.offsetHeight + 5;
+      let left = t.slot.getBoundingClientRect().left + scrollLeft;
+
+      t.pos = {
+        top: top + 'px',
+        left: left + 'px',
+      }
+    },
+    addScrollEvent(){
+      let t = this;
+      t.allScrollParents.forEach(function (item) {
+        addEvent(item, 'scroll', t.handleScroll)
+      })
+    },
+    removeScrollEvent(){
+      let t = this;
+      t.allScrollParents.forEach(function (item) {
+        removeEvent(item, 'scroll', t.handleScroll)
+      })
+    },
+
   },
 }
 </script>

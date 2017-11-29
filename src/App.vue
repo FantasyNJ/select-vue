@@ -10,6 +10,9 @@
     <HelloWorld>
       <input type="text" slot="fire-lenovo">
     </HelloWorld>
+    <div class="lala">
+      <div class="lala-con"></div>
+    </div>
   </div>
 </template>
 
@@ -53,10 +56,26 @@ export default {
   }
 
   .xixi{
+    position: absolute;
+    left: 50px;
+    top: 50px;
     height: 350px;
+    width: 350px;
+    background: blue;
   }
 
   .wrap{
     padding-top: 200px;
+  }
+
+  .lala{
+    width: 300px;
+    height: 300px;
+    background: palegreen;
+    overflow: auto;
+  }
+
+  .lala-con{
+    height: 500px;
   }
 </style>
