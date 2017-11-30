@@ -126,8 +126,6 @@
         // 插入到body中
         document.body.appendChild(elem);
 
-
-
         t.resetTransformOrigin();
       })
     },

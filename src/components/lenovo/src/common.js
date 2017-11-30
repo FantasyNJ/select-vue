@@ -70,12 +70,18 @@ export const getAllScrollParents = function(element){
 
   var arrScrollParents = [];
 
-  console.log(scrollParent, 'scrollParent')
-
   // 如果scrollParent存在返回
   if(scrollParent){
     return arrScrollParents.concat( scrollParent, getAllScrollParents(scrollParent) );
   }else {
     return [];
+  }
+}
+// 获取兼容body
+export const getBody = function(){
+  if(document.body.scrollTop){
+    return document.body;
+  }else{
+    return document.documentElement;
   }
 }

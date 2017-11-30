@@ -19,7 +19,7 @@
 <script>
 
   import Drop from './drop.vue';
-  import { addEvent, removeEvent, getAllScrollParents } from './src/common'
+  import { addEvent, removeEvent, getAllScrollParents, getBody, getStyleComputed } from './src/common';
 
 export default {
   name: 'lenovo-input',
@@ -35,6 +35,8 @@ export default {
     let t = this;
     t.$nextTick( () => {
       t.$el.dropmenu = t.$refs.drop.$el;
+
+      window.dropmenu = t.$el.dropmenu;
 
       // 获取drop
       t.slot = t.$refs.slot;
@@ -61,20 +63,71 @@ export default {
       t.removeScrollEvent();
     },
     // 滚动计算drop的位置
-    handleScroll(){
+    handleScroll(e){
       let t = this;
 
-      let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-      let scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+      // 滚动的目标元素，不在滚动事件触发时target设为document
+      let target = {};
 
-      // scrollTop需要兼容
-      let top = t.slot.getBoundingClientRect().top + scrollTop + t.slot.offsetHeight + 5;
-      let left = t.slot.getBoundingClientRect().left + scrollLeft;
+      // 获取document元素
+      let documentElem = getBody();
+
+      // 如果存在事件对象
+      if(e){
+        // 目标元素是document, document没有位置属性
+        if(e.target === document){
+          target = documentElem;
+        }else{
+          target = e.target;
+        }
+      }
+      // 不存在事件对象，目标定位document
+      else{
+        target = documentElem
+      }
+
+      // 当前元素
+      let slot = t.slot;
+
+      // slotHeight
+
+      let slotHeightSpace = 5;
+
+      let scrollTop = documentElem.scrollTop;
+      let scrollLeft = documentElem.scrollLeft;
+
+
+      let slotClient = slot.getBoundingClientRect();
+
+      // 窗口绝对位置
+      let screenBottomPos = documentElem.scrollTop + target.clientHeight;
+
+      let slotBottomPos = documentElem.scrollTop + slotClient.top + slot.clientHeight;
+
+      // drop在上方时的top值
+      let dropUpTop = slot.getBoundingClientRect().top + scrollTop - (slot.offsetHeight + 5);
+      // drop在下方时的top值
+      let dropDownTop = slot.getBoundingClientRect().top + scrollTop + slot.offsetHeight + 5;
+
+      let top = 0;
+
+      // 元素底部超过滚动元素底部，向上展示
+      if ( slotBottomPos >= screenBottomPos ){
+        top = slot.getBoundingClientRect().top + scrollTop - (slot.offsetHeight + slotHeightSpace);
+      }
+      // 在下方展示
+      else {
+        top = slot.getBoundingClientRect().top + scrollTop + slot.offsetHeight + slotHeightSpace;
+      }
+
+      let left = slot.getBoundingClientRect().left + scrollLeft;
 
       t.pos = {
         top: top + 'px',
         left: left + 'px',
       }
+
+
     },
     addScrollEvent(){
       let t = this;
@@ -93,7 +146,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;

@@ -9,10 +9,6 @@ Vue.config.productionTip = false
 Vue.directive('clickoutside', {
   bind: function (el, binding, vnode) {
     el.event = function (event) {
-      console.log(el.dropmenu, 'el.dropmenu')
-      console.log(event.target, 'event.target')
-
-
       // here I check that click was outside the el and his childrens
       if (!(el == event.target || el.contains(event.target) || el.dropmenu == event.target || el.dropmenu.contains(event.target))) {
         // and if it did, call method provided in attribute value
