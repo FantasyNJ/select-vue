@@ -63,6 +63,8 @@ export default {
         t.dropHeight = t.$el.dropmenu.offsetHeight;
 //        t.$el.dropmenu.style.visibility = '';
 
+        t.dir = 'down';
+
         // 判断位置
         t.handleScroll();
         // 绑定滚动事件定位drop元素
@@ -85,6 +87,7 @@ export default {
       // 获取document元素
       let documentElem = getBody();
 
+      /***************  只判断ducument
       // 如果存在事件对象
       if(e){
         // 目标元素是document, document没有位置属性
@@ -98,6 +101,7 @@ export default {
       else{
         target = documentElem
       }
+      **********************/
 
       // 当前元素
       let slot = t.slot;
@@ -110,7 +114,7 @@ export default {
       let slotClient = slot.getBoundingClientRect();
 
       // 窗口下方位置
-      let screenBottomPos = documentElem.scrollTop + target.clientHeight;
+      let screenBottomPos = documentElem.scrollTop + documentElem.clientHeight;
       // 下拉菜单下方位置
       let dropBottomPos = documentElem.scrollTop + slotClient.top + slot.clientHeight + t.slotHeightSpace + t.dropHeight;
 
