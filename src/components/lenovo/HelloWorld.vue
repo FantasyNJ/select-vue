@@ -30,7 +30,8 @@ export default {
       slot: {},
       allScrollParents: {},
       dropHeight: 0,
-      slotHeightSpace: 5
+      slotHeightSpace: 5,
+      dir: 'down',
     }
   },
   beforeMount(){
@@ -108,26 +109,45 @@ export default {
 
       let slotClient = slot.getBoundingClientRect();
 
-      // 窗口绝对位置
+      // 窗口下方位置
       let screenBottomPos = documentElem.scrollTop + target.clientHeight;
-
+      // 下拉菜单下方位置
       let dropBottomPos = documentElem.scrollTop + slotClient.top + slot.clientHeight + t.slotHeightSpace + t.dropHeight;
+
+      // 窗口上方位置
+      let screenTopPos = documentElem.scrollTop;
+      // 下拉菜单上方位置
+      let dropTopPos = documentElem.scrollTop + slotClient.top - ( t.slotHeightSpace + t.dropHeight );
 
       // drop在上方时的top值
       let dropUpTop = slot.getBoundingClientRect().top + scrollTop - (slot.offsetHeight + 5);
       // drop在下方时的top值
       let dropDownTop = slot.getBoundingClientRect().top + scrollTop + slot.offsetHeight + 5;
 
-      let top = 0;
 
       // 元素底部超过滚动元素底部，向上展示
-      if ( dropBottomPos >= screenBottomPos ){
-        top = slotClient.top + scrollTop - (t.slotHeightSpace + t.dropHeight);
+      let top = 0;
+
+      if( t.dir === 'down' ){
+        if ( dropBottomPos >= screenBottomPos){
+          top = slotClient.top + scrollTop - (t.slotHeightSpace + t.dropHeight);
+          t.dir = 'up';
+        }
+        // 在下方展示
+        else{
+          top = slot.getBoundingClientRect().top + scrollTop + slot.offsetHeight + t.slotHeightSpace;
+        }
+      }else if( t.dir === 'up' ){
+        if ( dropTopPos <= screenTopPos ){
+          top = slot.getBoundingClientRect().top + scrollTop + slot.offsetHeight + t.slotHeightSpace;
+          t.dir = 'down';
+        }
+        // 在上方展示
+        else {
+          top = slotClient.top + scrollTop - (t.slotHeightSpace + t.dropHeight);
+        }
       }
-      // 在下方展示
-      else {
-        top = slot.getBoundingClientRect().top + scrollTop + slot.offsetHeight + t.slotHeightSpace;
-      }
+
 
       let left = slot.getBoundingClientRect().left + scrollLeft;
 
