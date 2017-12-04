@@ -28,7 +28,9 @@ export default {
       dropVisible:false,
       pos: {},
       slot: {},
-      allScrollParents: {}
+      allScrollParents: {},
+      dropHeight: 0,
+      slotHeightSpace: 5
     }
   },
   beforeMount(){
@@ -52,9 +54,19 @@ export default {
     handleClick(){
       let t = this;
       t.dropVisible = true;
-      t.handleScroll();
-      // 绑定滚动事件定位drop元素
-      t.addScrollEvent();
+
+//      t.$el.dropmenu.style.visibility = 'hidden';
+
+      t.$nextTick( function(){
+        // 获取drop的高度
+        t.dropHeight = t.$el.dropmenu.offsetHeight;
+//        t.$el.dropmenu.style.visibility = '';
+
+        // 判断位置
+        t.handleScroll();
+        // 绑定滚动事件定位drop元素
+        t.addScrollEvent();
+      } )
     },
     hideDrop(){
       let t = this;
@@ -89,9 +101,6 @@ export default {
       // 当前元素
       let slot = t.slot;
 
-      // slotHeight
-
-      let slotHeightSpace = 5;
 
       let scrollTop = documentElem.scrollTop;
       let scrollLeft = documentElem.scrollLeft;
@@ -102,7 +111,7 @@ export default {
       // 窗口绝对位置
       let screenBottomPos = documentElem.scrollTop + target.clientHeight;
 
-      let slotBottomPos = documentElem.scrollTop + slotClient.top + slot.clientHeight;
+      let dropBottomPos = documentElem.scrollTop + slotClient.top + slot.clientHeight + t.slotHeightSpace + t.dropHeight;
 
       // drop在上方时的top值
       let dropUpTop = slot.getBoundingClientRect().top + scrollTop - (slot.offsetHeight + 5);
@@ -112,12 +121,12 @@ export default {
       let top = 0;
 
       // 元素底部超过滚动元素底部，向上展示
-      if ( slotBottomPos >= screenBottomPos ){
-        top = slot.getBoundingClientRect().top + scrollTop - (slot.offsetHeight + slotHeightSpace);
+      if ( dropBottomPos >= screenBottomPos ){
+        top = slotClient.top + scrollTop - (t.slotHeightSpace + t.dropHeight);
       }
       // 在下方展示
       else {
-        top = slot.getBoundingClientRect().top + scrollTop + slot.offsetHeight + slotHeightSpace;
+        top = slot.getBoundingClientRect().top + scrollTop + slot.offsetHeight + t.slotHeightSpace;
       }
 
       let left = slot.getBoundingClientRect().left + scrollLeft;
